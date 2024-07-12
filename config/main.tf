@@ -1,11 +1,20 @@
-# Configure the Microsoft Azure Provider
+// azurerm_subnet.subnet.id references a resource that does not exists yet
+// data is used to query existing value in the infrastructure
+// Use queried value to create a new resource with data.azurerm_public_ip_prefix.pip-prefix-out.id 
+// terraform destroy -–target azurerm_network_security_group.lab-nsg ; for example deletes the lab-nsg resource 
+// terraform.tfstate file holds the current state of your remote infra . It is created during the first init execution
+// terraform.tfstate.backup holds the old state of your infra before the new config gets applied 
+
+
+
+// Configure the Microsoft Azure Provider
 provider "azurerm" {
 #  subscription_id = PAYG-Sandboxes
   skip_provider_registration = true # This is only required when the User, Service Principal, or Identity running Terraform lacks the permissions to register Azure Resource Providers.
   features {}
 }
 
-#Create a NSG
+// Create a NSG
 resource "azurerm_network_security_group" "lab-nsg" {
   name                = "lab-nsg"
   location            = "westeurope"
@@ -23,7 +32,7 @@ security_rule {
   }
 }
 
-#Create a VNet
+// Create a VNet
 resource "azurerm_virtual_network" "lab-vnet" {
   name                = "lab-vnet"
   location            = "westeurope"
@@ -45,7 +54,7 @@ resource "azurerm_subnet" "subnet" {
 }
 
 
-#Create a PIP
+//Create a PIP
 resource "azurerm_public_ip" "lab-pip" {
   name                = "lab-pip"
   resource_group_name = "rg_sb_westeurope_124111_2_171968341434"
@@ -60,7 +69,7 @@ resource "azurerm_public_ip" "lab-pip" {
 }
 
 
-#Create a vNIC
+// Create a vNIC
 resource "azurerm_network_interface" "lab-nic" {
   name                = "lab-nic"
   location            = "westeurope"
@@ -68,19 +77,19 @@ resource "azurerm_network_interface" "lab-nic" {
 
   ip_configuration {
     name                          = "internal"
-    subnet_id                     = azurerm_subnet.subnet.id
+    subnet_id                     = azurerm_subnet.subnet.id       
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id = azurerm_public_ip.lab-pip.id
   }
 }
 
-#NSG and vNIC association
+// NSG and vNIC association
 resource "azurerm_network_interface_security_group_association" "nsg-nic" {
   network_interface_id      = azurerm_network_interface.lab-nic.id
   network_security_group_id = azurerm_network_security_group.lab-nsg.id
 }
 
-#Create a linux VM
+// Create a linux VM
 resource "azurerm_linux_virtual_machine" "example" {
   name                = "example-machine"
   resource_group_name = "rg_sb_westeurope_124111_2_171968341434"
@@ -109,12 +118,14 @@ resource "azurerm_linux_virtual_machine" "example" {
   }
 }
 
-#Output PIP
+// Query existing resource in Azure with data 
 #data "azurerm_public_ip_prefix" "pip-prefix-out" {
 #  name                 = "pip-prefix"
-#  resource_group_name  = "rg_sb_westeurope_124111_2_171968341434"
-#}
+#  resource_group_name  = "rg_sb_westeurope_124111_2_171968341434" }
 
+// Use queried value to create a new resource with data.azurerm_public_ip_prefix.pip-prefix-out.id 
+
+// Output PIP
 output "prefix-ip" {
   value = azurerm_public_ip.lab-pip.ip_address
 }
