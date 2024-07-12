@@ -14,7 +14,7 @@ provider "azurerm" {
   features {}
 }
 
-// Create the variables . You can specify them in 3 ways : with terraform apply prompt; with terraform apply -var "resource_group = rg_tf_004"; 
+// Create the variables . You can specify them in 3 ways : with terraform apply prompt; with terraform apply -var "resource_group = rg_tf_004"; or using a tfvars file .
 variable "resource_group" {
   description = "Azure resource group"
 }
@@ -105,6 +105,7 @@ resource "azurerm_linux_virtual_machine" "example" {
   location            = var.resource_location  // Define the location variable specified
   size                = "Standard_B2s"
   admin_username      = "adminuser"
+# count               = 3
   network_interface_ids = [
     azurerm_network_interface.lab-nic.id,
   ]
