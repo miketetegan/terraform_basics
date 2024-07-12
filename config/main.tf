@@ -17,10 +17,14 @@ provider "azurerm" {
 // Create the variables . You can specify them in 3 ways : with terraform apply prompt; with terraform apply -var "resource_group = rg_tf_004"; or using a tfvars file .
 variable "resource_group" {
   description = "Azure resource group"
+  default = "rg_tf_004"
+  type = string  // can define your variable type if needed 
 }
 
 variable "resource_location" {
-    description = "Resources location"
+  description = "Resources location"
+  default = "westus"
+  type = string  
 }
 
 
