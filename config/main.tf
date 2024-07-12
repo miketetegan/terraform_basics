@@ -14,11 +14,22 @@ provider "azurerm" {
   features {}
 }
 
+// Create the variables . You can specify them in 3 ways : with terraform apply prompt; with terraform apply -var "resource_group = rg_tf_004"; 
+variable "resource_group" {
+  description = "Azure resource group"
+}
+
+variable "resource_location" {
+    description = "Resources location"
+}
+
+
+
 // Create a NSG
 resource "azurerm_network_security_group" "lab-nsg" {
   name                = "lab-nsg"
-  location            = "westeurope"
-  resource_group_name = "rg_sb_westeurope_124111_2_171968341434"
+  location            = var.resource_location  // Define the location variable specified
+  resource_group_name = var.resource_group   //Define the rg variable specified 
 security_rule {
     name                       = "allow-ssh"
     priority                   = 100
@@ -35,8 +46,8 @@ security_rule {
 // Create a VNet
 resource "azurerm_virtual_network" "lab-vnet" {
   name                = "lab-vnet"
-  location            = "westeurope"
-  resource_group_name = "rg_sb_westeurope_124111_2_171968341434"
+  location            = var.resource_location  // Define the location variable specified
+  resource_group_name = var.resource_group   //Define the rg variable specified 
   address_space       = ["10.0.0.0/16"]
 }
 #  subnet {
@@ -48,7 +59,7 @@ resource "azurerm_virtual_network" "lab-vnet" {
 
 resource "azurerm_subnet" "subnet" {
   name                 = "subnet"
-  resource_group_name  = "rg_sb_westeurope_124111_2_171968341434"
+  resource_group_name  = var.resource_group   //Define the rg variable specified 
   virtual_network_name = "lab-vnet"
   address_prefixes     = ["10.0.0.0/24"]
 }
@@ -57,12 +68,10 @@ resource "azurerm_subnet" "subnet" {
 //Create a PIP
 resource "azurerm_public_ip" "lab-pip" {
   name                = "lab-pip"
-  resource_group_name = "rg_sb_westeurope_124111_2_171968341434"
-  location            = "westeurope"
+  resource_group_name = var.resource_group   //Define the rg variable specified 
+  location            = var.resource_location  // Define the location variable specified
   allocation_method   = "Static"
   sku = "Standard"
-
-
   tags = {
     environment = "Production"
   }
@@ -72,8 +81,8 @@ resource "azurerm_public_ip" "lab-pip" {
 // Create a vNIC
 resource "azurerm_network_interface" "lab-nic" {
   name                = "lab-nic"
-  location            = "westeurope"
-  resource_group_name = "rg_sb_westeurope_124111_2_171968341434"
+  location            = var.resource_location  // Define the location variable specified
+  resource_group_name = var.resource_group   //Define the rg variable specified 
 
   ip_configuration {
     name                          = "internal"
@@ -92,8 +101,8 @@ resource "azurerm_network_interface_security_group_association" "nsg-nic" {
 // Create a linux VM
 resource "azurerm_linux_virtual_machine" "example" {
   name                = "example-machine"
-  resource_group_name = "rg_sb_westeurope_124111_2_171968341434"
-  location            = "westeurope"
+  resource_group_name = var.resource_group   //Define the rg variable specified 
+  location            = var.resource_location  // Define the location variable specified
   size                = "Standard_B2s"
   admin_username      = "adminuser"
   network_interface_ids = [
@@ -119,13 +128,14 @@ resource "azurerm_linux_virtual_machine" "example" {
 }
 
 // Query existing resource in Azure with data 
-#data "azurerm_public_ip_prefix" "pip-prefix-out" {
-#  name                 = "pip-prefix"
-#  resource_group_name  = "rg_sb_westeurope_124111_2_171968341434" }
+data "azurerm_public_ip_prefix" "pip-prefix-out" {
+  name                 = "pip-prefix"
+  resource_group_name  = var.resource_group   //Define the rg variable specified  }
 
 // Use queried value to create a new resource with data.azurerm_public_ip_prefix.pip-prefix-out.id 
 
-// Output PIP
+
+// Output PIP at the end of the execution
 output "prefix-ip" {
   value = azurerm_public_ip.lab-pip.ip_address
 }
