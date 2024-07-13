@@ -4,6 +4,7 @@
 // terraform destroy -–target azurerm_network_security_group.lab-nsg ; for example deletes the lab-nsg resource 
 // terraform.tfstate file holds the current state of your remote infra . It is created during the first init execution
 // terraform.tfstate.backup holds the old state of your infra before the new config gets applied 
+// You can use the existing resources as the values of the modules variables like azurerm_virtual_network.lab-vnet.id
 
 
 
@@ -16,6 +17,22 @@ provider "azurerm" {
 
 // Create the variables . You can specify them in 3 ways : with terraform apply prompt; with terraform apply -var "resource_group = rg_tf_004"; or using a tfvars file .
 
+
+
+// Use the module
+// You can use the existing resources as the values of the modules variables like azurerm_virtual_network.lab-vnet.id
+module "azvnet" {
+  source = "./modules/azvnet"          //Define the location of the module
+  vnet_name = "vnet_test"              // Define the values of the variables listed in the module
+  resource_location = var.resource_location
+  resource_group = var.resource_group      // References variables in the root variable file. In that case the tfvars file is used for the values
+  address_space_list = [10.0.0.0/16]
+  address_prefixes_list = [10.0.0.0/24]
+}
+
+output "test_module_output" {
+  value = module.azvnet.vnet_output.id        // Access object created from resources defined in modules, by using outputs file of the module: module.<module_name>.<module_output>.<object> . You can also use it during creation of new resources
+}
 
 // Create a NSG
 resource "azurerm_network_security_group" "lab-nsg" {
