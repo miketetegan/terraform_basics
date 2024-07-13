@@ -1,4 +1,3 @@
-module "vnet_example_complete" {
-  source  = "Azure/vnet/azurerm//examples/complete"
-  version = "4.1.0"
-}
+// Contains the actual resources you want to create 
+
+resoure 
