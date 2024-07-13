@@ -1,6 +1,6 @@
 // Contains the actual resources you want to create 
 
-resource "azurerm_virtual_network" "lab-vnet" {
+resource "azurerm_virtual_network" "module-vnet" {
   name                = var.vnet_name
   location            = var.resource_location  // Define the location variable specified
   resource_group_name = var.resource_group   //Define the rg variable specified 
