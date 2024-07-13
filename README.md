@@ -1,1 +1,1 @@
-<h1> Simple repo to highlight the use of different Terraform files </h1>
+<h2> Simple repo to highlight the use of different Terraform files </h2>
