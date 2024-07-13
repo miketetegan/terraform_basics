@@ -129,6 +129,4 @@ data "azurerm_public_ip_prefix" "pip-prefix-out" {
 
 
 // Output PIP at the end of the execution
-output "prefix-ip" {
-  value = azurerm_public_ip.lab-pip.ip_address
-}
+
